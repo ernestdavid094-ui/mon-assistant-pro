@@ -205,6 +205,9 @@ export default {
     if(url.pathname === "/" || url.pathname === "/index.html"){
       return new Response(HTML,{headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});
     }
+    if(url.pathname === "/" || url.pathname === "/index.html"){
+      return new Response(HTML,{headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});
+    }
     if(env.ASSETS){
       const asset=await env.ASSETS.fetch(req);
       if(asset.status!==404) return asset;
