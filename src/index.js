@@ -144,7 +144,7 @@ const HTML = `<!doctype html>
 const sb=supabase.createClient("https://mpskusndhblcxzcikzey.supabase.co","sb_publishable_W-5z7pwEpUFAKS6YY__l0A_OXi1cBGU");
 const $=id=>document.getElementById(id);
 async function session(){return (await sb.auth.getSession()).data.session}
-async function call(path,opts={}){const s=await session(); if(!s) throw Error("Connexion requise"); const r=await fetch(path,{...opts,headers:{"Content-Type":"application/json","Authorization:" : "Bearer "+s.access_token,...(opts.headers||{})}}); const d=await r.json(); if(!r.ok) throw Error(d.error||"Erreur"); return d}
+async function call(path,opts={}){const s=await session(); if(!s) throw Error("Connexion requise"); const r=await fetch(path,{...opts,headers:{"Content-Type":"application/json","Authorization":"Bearer "+s.access_token,...(opts.headers||{})}}); const d=await r.json(); if(!r.ok) throw Error(d.error||"Erreur"); return d}
 async function refresh(){const d=await call("/api/me"); $("setup").classList.toggle("hide",!!d.business); $("dashboard").classList.toggle("hide",!d.business); if(d.business){$("businessInfo").innerHTML="<b>"+d.business.name+"</b><br>"+(d.business.type||"")+"<br>"+(d.business.city||""); await loadProducts()}}
 async function loadProducts(){const d=await call("/api/products"); $("products").innerHTML=d.products.length?d.products.map(p=>"<div class='msg'><b>"+p.name+"</b> — "+Number(p.price).toLocaleString()+" FCFA<br>Stock: "+p.stock+"</div>").join(""):"Aucun produit."}
 $("signup").onclick=async()=>{try{const r=await sb.auth.signUp({email:$("suEmail").value,password:$("suPass").value});$("authMsg").textContent=r.error?.message||"Compte créé. Vérifiez votre email si Supabase le demande."}catch(e){$("authMsg").textContent=e.message}}
