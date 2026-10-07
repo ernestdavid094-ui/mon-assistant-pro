@@ -228,7 +228,7 @@ const HTML = String.raw`<!doctype html>
 <header class="landing-nav">
   <div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div>
   <div class="landing-links"><a href="#fallback-solution">Ce que je peux faire</a><a href="#fallback-benefits">Avantages</a><a href="#fallback-plans">Formules</a></div>
-  <div class="landing-actions"><button class="btn btn-secondary" id="fallbackLogin">Se connecter</button><button class="btn btn-primary" id="fallbackSignup">Créer mon espace</button></div>
+  <div class="landing-actions"><button class="btn btn-secondary" id="fallbackLogin" onclick="openAuth('login')">Se connecter</button><button class="btn btn-primary" id="fallbackSignup" onclick="openAuth('signup')">Créer mon espace</button></div>
 </header>
 <main>
 <section class="landing-hero">
@@ -236,7 +236,7 @@ const HTML = String.raw`<!doctype html>
     <div class="pill dark-pill">✦ L’assistant commercial pensé pour les petites activités</div>
     <h1>Votre activité mérite un assistant qui <span>travaille avec vous.</span></h1>
     <p>Mon Assistant Pro vous aide à comprendre votre activité, attirer des clients, vendre, organiser vos informations et décider quoi faire ensuite — même si vous débutez.</p>
-    <div class="hero-actions"><button class="btn btn-primary btn-lg" id="fallbackHeroSignup">Commencer gratuitement →</button><a class="btn btn-secondary btn-lg" href="#fallback-solution">Découvrir comment ça marche</a></div>
+    <div class="hero-actions"><button class="btn btn-primary btn-lg" id="fallbackHeroSignup" onclick="openAuth('signup')">Commencer gratuitement →</button><a class="btn btn-secondary btn-lg" href="#fallback-solution">Découvrir comment ça marche</a></div>
     <div class="trust-row"><span>✓ Email + mot de passe simple</span><span>✓ Simple à utiliser</span><span>✓ Pensé pour le terrain</span></div>
   </div>
   <div class="hero-card"><img class="hero-image" src="/images/assistant-entrepreneur.webp" alt="Entrepreneur utilisant Mon Assistant Pro" loading="eager"></div>
@@ -291,7 +291,7 @@ async function call(path,opts){
   if(!s) throw Error("Connexion requise.");
   const headers=Object.assign({"Content-Type":"application/json","Authorization":"Bearer "+s.access_token},opts.headers||{});
   const r=await fetch(path,Object.assign({},opts,{headers:headers}));
-  const d=await r.json().catch(function(){return {}}); if(!r.ok) throw Error(d.error||"Erreur");
+  const d=await r.json().catch(function(){return {}}); if(!r.ok){const detail=d&&(d.error||d.message||d.error_description);throw Error(detail||("Erreur HTTP "+r.status));}
   return d;
 }
 
@@ -565,11 +565,11 @@ function bindFallbackAuth(){
   if(window.__authEntryPointsBound)return;
   window.__authEntryPointsBound=true;
   document.addEventListener("click",function(e){
-    var el=e.target&&e.target.closest?e.target.closest("#goLogin,#goSignup,#heroSignup,#finalSignup,#fallbackFinalSignup,#fallbackPlanFree,#fallbackPlanPro,#fallbackPlanPlus,.plan-btn"):null;
+    var el=e.target&&e.target.closest?e.target.closest("#goLogin,#goSignup,#heroSignup,#finalSignup,#fallbackLogin,#fallbackSignup,#fallbackHeroSignup,#fallbackFinalSignup,#fallbackPlanFree,#fallbackPlanPro,#fallbackPlanPlus,.plan-btn"):null;
     if(!el)return;
     e.preventDefault();
     e.stopPropagation();
-    openAuth(el.id==="goLogin"?"login":"signup");
+    openAuth((el.id==="goLogin"||el.id==="fallbackLogin")?"login":"signup");
   },true);
 }
 bindFallbackAuth();
