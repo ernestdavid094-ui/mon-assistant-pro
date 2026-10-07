@@ -5,6 +5,9 @@ compatibility_date = "2026-10-07"
 [ai]
 binding = "AI"
 
+[assets]
+directory = "./public"
+
 [vars]
 SUPABASE_URL = "https://mpskusndhblcxzcikzey.supabase.co"
 SUPABASE_PUBLISHABLE_KEY = "sb_publishable_W-5z7pwEpUFAKS6YY__l0A_OXi1cBGU"
