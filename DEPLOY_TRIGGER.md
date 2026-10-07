@@ -1,0 +1,1 @@
+Déploiement automatique GitHub → Cloudflare activé. Ce fichier sert de déclencheur initial.
