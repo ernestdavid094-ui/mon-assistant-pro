@@ -274,38 +274,99 @@ function feature(icon,title,desc,result){return '<div class="feature-card"><div 
 function benefit(n,title,desc){return '<div class="benefit-item"><span>'+n+'</span><div><h3>'+title+'</h3><p>'+desc+'</p></div></div>'}
 function plan(name,price,period,features,cta,featured){return '<div class="plan '+(featured?'featured':'')+'">'+(featured?'<div class="popular">LE PLUS CHOISI</div>':'')+'<h3>'+name+'</h3><div class="plan-price">'+price+'<small>'+(period==='Pour démarrer'?'':' / '+period)+'</small></div><p class="plan-for">'+period+'</p><div class="plan-features">'+features+'</div><button class="btn '+(featured?'btn-primary':'btn-secondary')+' full plan-btn">'+cta+'</button></div>'}
 
-function authView(mode){
-root.innerHTML='<div class="auth-page"><div class="auth-side"><div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div><div class="auth-side-copy"><span class="eyebrow light">VOTRE ESPACE PROFESSIONNEL</span><h1>Pas besoin d’email pour commencer.</h1><p>Votre numéro de téléphone suffit. Nous vous envoyons un code de vérification pour sécuriser votre accès.</p><div class="auth-benefits"><span>✓ Connexion simple</span><span>✓ Aucun mot de passe à retenir</span><span>✓ Accès à votre tableau de bord</span></div></div></div><div class="auth-main"><div class="auth-card auth-modern"><button class="back-link" id="backHome">← Retour à l’accueil</button><div class="auth-icon">M</div><h2 id="authTitle">'+(mode==="login"?"Se connecter":"Créer mon espace")+'</h2><p class="muted" id="authSub">Entrez votre numéro de téléphone. Vous recevrez un code à 6 chiffres.</p><div id="phoneStep"><div class="phone-field"><select id="countryCode"><option value="+229" selected>🇧🇯 +229</option><option value="+228">🇹🇬 +228</option><option value="+225">🇨🇮 +225</option><option value="+221">🇸🇳 +221</option><option value="+237">🇨🇲 +237</option></select><input id="phone" inputmode="tel" autocomplete="tel" placeholder="90 00 00 00"></div><button class="btn btn-primary full btn-lg" id="sendOtp">Recevoir mon code →</button><div class="auth-msg" id="authMsg"></div><p class="auth-switch">'+(mode==="login"?'Nouveau ici ? <span class="link" id="switchAuth">Créer mon espace</span>':'Vous avez déjà un compte ? <span class="link" id="switchAuth">Se connecter</span>')+'</p></div><div id="otpStep" class="hidden"><div class="otp-label">Code reçu par SMS</div><input id="otp" class="otp-input" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000"><button class="btn btn-primary full btn-lg" id="verifyOtp">Vérifier et entrer →</button><button class="btn btn-secondary full" id="resendOtp" style="margin-top:10px">Renvoyer le code</button><div class="auth-msg" id="otpMsg"></div></div><div class="security-note">🔒 Votre numéro sert uniquement à sécuriser votre accès. Ne partagez jamais votre code.</div></div></div></div>';
+function authView(mode,screen){
+const isSignup=mode==="signup";
+const isPhone=mode==="phone";
+const isReset=screen==="reset";
+if(isReset){
+root.innerHTML='<div class="auth-page"><div class="auth-side"><div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div><div class="auth-side-copy"><span class="eyebrow light">RÉCUPÉRATION SÉCURISÉE</span><h1>Retrouvez l’accès à votre espace.</h1><p>Un lien sécurisé vous sera envoyé par email pour choisir un nouveau mot de passe.</p><div class="auth-benefits"><span>✓ Aucun SMS nécessaire</span><span>✓ Lien sécurisé à usage unique</span><span>✓ Nouveau mot de passe immédiatement</span></div></div></div><div class="auth-main"><div class="auth-card auth-modern"><button class="back-link" id="backAuth">← Retour à la connexion</button><div class="auth-icon">↻</div><h2>Mot de passe oublié ?</h2><p class="muted">Entrez l’adresse email associée à votre compte.</p><div class="field"><label>Adresse email</label><input id="resetEmail" type="email" autocomplete="email" placeholder="vous@exemple.com"></div><button class="btn btn-primary full btn-lg" id="sendReset">Recevoir le lien de récupération →</button><div class="auth-msg" id="resetMsg"></div><div class="security-note">🔒 Pour les comptes créés uniquement avec un numéro de téléphone, ajoutez une adresse email de récupération dans Réglages dès que possible. Sans SMS, elle est nécessaire pour une récupération automatique.</div></div></div></div>';
+document.getElementById("backAuth").onclick=()=>authView("login");
+document.getElementById("sendReset").onclick=async function(){
+const email=document.getElementById("resetEmail").value.trim();
+const msg=document.getElementById("resetMsg");
+if(!email||!email.includes("@")){msg.textContent="Entrez une adresse email valide.";return}
+try{
+document.getElementById("sendReset").disabled=true;
+const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname+"?recovery=1"});
+if(error)throw error;
+msg.style.color="#067647";
+msg.textContent="Si cette adresse correspond à un compte, un lien de récupération vient d’être envoyé.";
+}catch(e){msg.textContent=e.message||"Impossible d’envoyer le lien de récupération."}
+finally{document.getElementById("sendReset").disabled=false}
+};
+return;
+}
+root.innerHTML='<div class="auth-page"><div class="auth-side"><div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div><div class="auth-side-copy"><span class="eyebrow light">VOTRE ESPACE PROFESSIONNEL</span><h1>Un accès simple, sans SMS.</h1><p>Choisissez votre méthode préférée : email + mot de passe, ou numéro de téléphone + mot de passe.</p><div class="auth-benefits"><span>✓ Email + mot de passe</span><span>✓ Téléphone + mot de passe</span><span>✓ Récupération du mot de passe par email</span></div></div></div><div class="auth-main"><div class="auth-card auth-modern"><button class="back-link" id="backHome">← Retour à l’accueil</button><div class="auth-icon">M</div><h2 id="authTitle">'+(isSignup?"Créer mon espace":"Se connecter")+'</h2><p class="muted" id="authSub">'+(isSignup?"Choisissez comment vous souhaitez créer votre compte.":"Choisissez votre méthode de connexion.")+'</p><div class="quick" style="margin:18px 0 4px"><button class="btn '+(!isPhone?'btn-primary':'btn-secondary')+'" id="emailMode">✉ Email</button><button class="btn '+(isPhone?'btn-primary':'btn-secondary')+'" id="phoneMode">☎ Téléphone</button></div><div id="authForm"></div><div class="auth-msg" id="authMsg"></div><p class="auth-switch">'+(isSignup?'Vous avez déjà un compte ? <span class="link" id="switchAuth">Se connecter</span>':'Nouveau ici ? <span class="link" id="switchAuth">Créer mon espace</span>')+'</p><div class="security-note">🔒 Aucun SMS n’est utilisé. La récupération du mot de passe se fait par email.</div></div></div></div>';
 document.getElementById("backHome").onclick=landingView;
-document.getElementById("switchAuth").onclick=()=>authView(mode==="login"?"signup":"login");
-let lastPhone="";
-async function sendOtp(){
-const raw=document.getElementById("phone").value.replace(/\\D/g,"");
-if(raw.length<7){document.getElementById("authMsg").textContent="Entrez un numéro de téléphone valide.";return}
-lastPhone=document.getElementById("countryCode").value+raw;
-try{
-document.getElementById("sendOtp").disabled=true;
-const {error}=await supabaseClient.auth.signInWithOtp({phone:lastPhone});
-if(error) throw error;
-document.getElementById("phoneStep").classList.add("hidden");document.getElementById("otpStep").classList.remove("hidden");document.getElementById("authSub").textContent="Entrez le code à 6 chiffres envoyé à "+lastPhone+".";
-document.getElementById("otp").focus();
-}catch(e){document.getElementById("authMsg").textContent=e.message||"Impossible d’envoyer le code. Vérifiez la configuration SMS."}
-finally{document.getElementById("sendOtp").disabled=false}
+document.getElementById("emailMode").onclick=()=>authView(mode==="login"?"login":"signup");
+document.getElementById("phoneMode").onclick=()=>authView("phone",isSignup?"signup":"login");
+document.getElementById("switchAuth").onclick=()=>authView(isSignup?"login":"signup");
+const form=document.getElementById("authForm");
+const forgot=!isSignup&&!isPhone?'<div style="text-align:right;margin-top:8px"><span class="link" id="forgotPassword">Mot de passe oublié ?</span></div>':"";
+if(isPhone){
+form.innerHTML='<div class="phone-field"><select id="countryCode"><option value="+229" selected>🇧🇯 +229</option><option value="+228">🇹🇬 +228</option><option value="+225">🇨🇮 +225</option><option value="+221">🇸🇳 +221</option><option value="+237">🇨🇲 +237</option></select><input id="phone" inputmode="tel" autocomplete="tel" placeholder="90 00 00 00"></div><div class="field"><label>Mot de passe</label><input id="phonePassword" type="password" autocomplete="'+(isSignup?"new-password":"current-password")+'" placeholder="Au moins 8 caractères"></div>'+(isSignup?'<div class="field"><label>Email de récupération <span class="muted">(recommandé)</span></label><input id="phoneRecoveryEmail" type="email" autocomplete="email" placeholder="vous@exemple.com"></div>':"")+'<button class="btn btn-primary full btn-lg" id="phoneSubmit">'+(isSignup?"Créer mon compte →":"Se connecter →")+'</button>';
+}else{
+form.innerHTML='<div class="field"><label>Adresse email</label><input id="email" type="email" autocomplete="email" placeholder="vous@exemple.com"></div><div class="field"><label>Mot de passe</label><input id="emailPassword" type="password" autocomplete="'+(isSignup?"new-password":"current-password")+'" placeholder="Au moins 8 caractères"></div><button class="btn btn-primary full btn-lg" id="emailSubmit">'+(isSignup?"Créer mon compte →":"Se connecter →")+'</button>'+forgot;
 }
-async function verifyOtp(){
-const token=document.getElementById("otp").value.replace(/\\D/g,"");
-if(token.length!==6){document.getElementById("otpMsg").textContent="Le code doit contenir 6 chiffres.";return}
+async function submit(){
+const msg=document.getElementById("authMsg");
+msg.textContent="";
 try{
-document.getElementById("verifyOtp").disabled=true;
-const {error}=await supabaseClient.auth.verifyOtp({phone:lastPhone,token,type:"sms"});
-if(error) throw error;
+if(isPhone){
+const raw=document.getElementById("phone").value.replace(/\D/g,"");
+const phone=document.getElementById("countryCode").value+raw;
+const password=document.getElementById("phonePassword").value;
+if(raw.length<7)throw Error("Entrez un numéro de téléphone valide.");
+if(password.length<8)throw Error("Le mot de passe doit contenir au moins 8 caractères.");
+if(isSignup){
+const recovery=document.getElementById("phoneRecoveryEmail")?.value.trim()||"";
+const {data,error}=await supabaseClient.auth.signUp({phone,password,options:{data:{recovery_email:recovery}}});
+if(error)throw error;
+if(!data.session){msg.style.color="#067647";msg.textContent="Compte créé. Si la confirmation du téléphone est activée dans Supabase, un SMS serait nécessaire. Nous l’avons désactivée pour ce mode.";return}
 await boot();
-}catch(e){document.getElementById("otpMsg").textContent=e.message||"Code incorrect ou expiré."}
-finally{document.getElementById("verifyOtp").disabled=false}
+}else{
+const {error}=await supabaseClient.auth.signInWithPassword({phone,password});
+if(error)throw error;
+await boot();
 }
-document.getElementById("sendOtp").onclick=sendOtp;
-document.getElementById("verifyOtp").onclick=verifyOtp;
-document.getElementById("resendOtp").onclick=sendOtp;
+}else{
+const email=document.getElementById("email").value.trim();
+const password=document.getElementById("emailPassword").value;
+if(!email||!email.includes("@"))throw Error("Entrez une adresse email valide.");
+if(password.length<8)throw Error("Le mot de passe doit contenir au moins 8 caractères.");
+if(isSignup){
+const {data,error}=await supabaseClient.auth.signUp({email,password});
+if(error)throw error;
+if(!data.session){msg.style.color="#067647";msg.textContent="Compte créé. Vérifiez votre email si la confirmation email est activée.";return}
+await boot();
+}else{
+const {error}=await supabaseClient.auth.signInWithPassword({email,password});
+if(error)throw error;
+await boot();
+}
+}
+}catch(e){msg.style.color="#d92d20";msg.textContent=e.message||"Impossible de poursuivre."}
+}
+document.getElementById("emailSubmit")?.addEventListener("click",submit);
+document.getElementById("phoneSubmit")?.addEventListener("click",submit);
+document.getElementById("forgotPassword")?.addEventListener("click",()=>authView("login","reset"));
+}
+
+function recoveryView(){
+root.innerHTML='<div class="auth-page"><div class="auth-side"><div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div><div class="auth-side-copy"><span class="eyebrow light">NOUVEAU MOT DE PASSE</span><h1>Sécurisez à nouveau votre espace.</h1><p>Choisissez un nouveau mot de passe. Vous pourrez ensuite vous reconnecter normalement.</p></div></div><div class="auth-main"><div class="auth-card auth-modern"><div class="auth-icon">✓</div><h2>Nouveau mot de passe</h2><p class="muted">Utilisez un mot de passe d’au moins 8 caractères.</p><div class="field"><label>Nouveau mot de passe</label><input id="newPassword" type="password" autocomplete="new-password" placeholder="Au moins 8 caractères"></div><div class="field"><label>Confirmer le mot de passe</label><input id="newPassword2" type="password" autocomplete="new-password" placeholder="Répétez le mot de passe"></div><button class="btn btn-primary full btn-lg" id="savePassword">Enregistrer le nouveau mot de passe →</button><div class="auth-msg" id="recoveryMsg"></div></div></div></div>';
+document.getElementById("savePassword").onclick=async function(){
+const p=document.getElementById("newPassword").value;
+const p2=document.getElementById("newPassword2").value;
+const msg=document.getElementById("recoveryMsg");
+if(p.length<8){msg.textContent="Le mot de passe doit contenir au moins 8 caractères.";return}
+if(p!==p2){msg.textContent="Les deux mots de passe ne correspondent pas.";return}
+try{
+const {error}=await supabaseClient.auth.updateUser({password:p});
+if(error)throw error;
+msg.style.color="#067647";msg.textContent="Mot de passe modifié. Connexion en cours…";
+setTimeout(()=>boot(),700);
+}catch(e){msg.textContent=e.message||"Impossible de modifier le mot de passe."}
+};
 }
 function shell(){
 root.innerHTML='<div class="shell"><aside class="sidebar"><div class="side-brand"><div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div></div><nav class="nav" id="nav"><button data-page="dashboard">⌂ <span>Vue d’ensemble</span></button><button data-page="activity">◈ <span>Mon activité</span></button><button data-page="products">▣ <span>Produits & services</span></button><button data-page="sales">↗ <span>Ventes</span></button><button data-page="customers">◎ <span>Clients</span></button><button data-page="assistant">✦ <span>Assistant Pro</span></button><button data-page="preview">◉ <span>Ma page</span></button><button data-page="settings">⚙ <span>Réglages</span></button></nav><div class="side-bottom"><div class="user-mini"><b id="sideBusiness">Mon activité</b><br><span id="sideEmail" style="color:#7f8a9e"></span></div></div></aside><main class="main"><header class="topbar"><div class="top-title" id="topTitle">Vue d’ensemble</div><div style="display:flex;gap:9px;align-items:center"><button class="btn btn-soft mobile-menu" id="quickAssistant">✦ Assistant</button><button class="btn btn-secondary" id="logout">Déconnexion</button></div></header><div class="content" id="content"></div></main></div>';
@@ -393,7 +454,7 @@ function openProduct(){const m=modal("Ajouter un produit ou service",'<div class
 function openSale(){const m=modal("Enregistrer une vente",'<div class="field"><label>Montant total (FCFA)</label><input id="sTotal" type="number" placeholder="5000"></div><div class="field"><label>Mode de paiement</label><select id="sPay"><option value="cash">Espèces</option><option value="mobile_money">Mobile Money</option><option value="other">Autre</option></select></div><button class="btn btn-primary full" id="sSave">Enregistrer la vente</button>');m.querySelector("#sSave").onclick=async function(){try{await call("/api/sales",{method:"POST",body:JSON.stringify({total:m.querySelector("#sTotal").value,payment_method:m.querySelector("#sPay").value})});m.remove();await loadData();state.page="dashboard";renderPage();toast("Vente enregistrée.");}catch(e){toast(e.message)}}}
 async function sendAssistant(q){q=String(q||"").trim();if(!q)return;const chat=document.getElementById("chat");if(!chat)return;chat.innerHTML+='<div class="bubble user">'+esc(q)+'</div>';chat.innerHTML+='<div class="bubble ai" id="thinking">Analyse en cours…</div>';chat.scrollTop=chat.scrollHeight;try{const d=await call("/api/assistant",{method:"POST",body:JSON.stringify({message:q})});const t=document.getElementById("thinking");if(t)t.outerHTML='<div class="bubble ai">'+esc(d.answer||"Je n’ai pas pu répondre.")+'</div>'}catch(e){const t=document.getElementById("thinking");if(t)t.outerHTML='<div class="bubble ai">Je rencontre un problème pour répondre. Réessayez dans un instant.</div>'}chat.scrollTop=chat.scrollHeight}
 
-supabaseClient.auth.onAuthStateChange(function(event,s){if(event==="SIGNED_OUT")landingView()});
+supabaseClient.auth.onAuthStateChange(function(event,s){if(event==="SIGNED_OUT")landingView();if(event==="PASSWORD_RECOVERY")recoveryView();});
 (async function(){try{await boot()}catch(e){console.error(e);landingView()}})();
 </script>
 </body></html>`;
