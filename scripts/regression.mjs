@@ -6,8 +6,7 @@ const checks=[
   ["landing signup button", /id="goSignup"/],
   ["single landing root", /function landingView\(\)/],
   ["no fallback landing markup", !/<div id="root"><div class="landing">/.test(src)],
-  ["landing login handler", /document\.getElementById\("goLogin"\)\.onclick/],
-  ["landing signup handler", /document\.getElementById\("goSignup"\)\.onclick/],
+  ["landing auth delegation", /closest\("#goLogin,#goSignup,#heroSignup,#finalSignup/.test(src)],
   ["email signup", /auth\.signUp\(\{email,password/],
   ["email login", /auth\.signInWithPassword\(\{email,password\}/],
   ["server user validation", /authenticatedUser\(env,token\)/],
@@ -17,7 +16,7 @@ const checks=[
   ["Cloudflare AI model", /@cf\/meta\/llama-3\.2-3b-instruct/],
   ["preview assistant action", /data-go="assistant"/],
   ["single worker root handler", /if\(url\.pathname === "\/" \|\| url\.pathname === "\/index\.html"\)/],
-  ["no duplicate root handler", !((src.match(/if\(url\.pathname === "\/" \|\| url\.pathname === "\/index\.html"\)/g)||[]).length>1)],
+  ["no duplicate root handler", ((src.match(/if\(url\.pathname === "\/" \|\| url\.pathname === "\/index\.html"\)/g)||[]).length===1)],
   ["dashboard navigation", /data-page="dashboard"/],
   ["activity navigation", /data-page="activity"/],
   ["products navigation", /data-page="products"/],
@@ -32,7 +31,10 @@ const checks=[
   ["onboarding action", /id="createBusiness"/],
   ["logout action", /auth\.signOut\(\)/],
 ];
-const failures=checks.filter(([name,re])=>!re.test(src));
+const failures=checks.filter(([name,re])=>{
+  const ok = re instanceof RegExp ? re.test(src) : re;
+  return !ok;
+});
 if(failures.length){
   console.error("Regression checks failed:");
   for(const [name] of failures) console.error(" - "+name);
