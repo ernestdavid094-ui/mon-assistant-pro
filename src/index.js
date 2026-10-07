@@ -217,7 +217,7 @@ const HTML = String.raw`<!doctype html>
 <body>
 <div id="root"><div style="min-height:100vh;display:grid;place-items:center;padding:24px;font-family:system-ui,sans-serif;color:#101828"><div style="text-align:center;max-width:520px"><div style="font-size:28px;font-weight:800">Mon Assistant Pro</div><p style="color:#667085;margin-top:10px">Chargement de votre espace…</p></div></div></div>
 <div id="toast" class="toast hidden"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://unpkg.com/@supabase/supabase-js@2';document.head.appendChild(s)"></script>
 <script>
 const SUPA_URL="https://mpskusndhblcxzcikzey.supabase.co";
 const SUPA_KEY="sb_publishable_W-5z7pwEpUFAKS6YY__l0A_OXi1cBGU";
