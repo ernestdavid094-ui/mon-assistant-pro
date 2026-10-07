@@ -217,11 +217,10 @@ const HTML = String.raw`<!doctype html>
 <body>
 <div id="root"><div style="min-height:100vh;display:grid;place-items:center;padding:24px;font-family:system-ui,sans-serif;color:#101828"><div style="text-align:center;max-width:520px"><div style="font-size:28px;font-weight:800">Mon Assistant Pro</div><p style="color:#667085;margin-top:10px">Chargement de votre espace…</p></div></div></div>
 <div id="toast" class="toast hidden"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://unpkg.com/@supabase/supabase-js@2';document.head.appendChild(s)"></script>
 <script>
 const SUPA_URL="https://mpskusndhblcxzcikzey.supabase.co";
 const SUPA_KEY="sb_publishable_W-5z7pwEpUFAKS6YY__l0A_OXi1cBGU";
-const supabaseClient=supabase.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:"mon-assistant-pro-auth"}});
+let supabaseClient=null;
 const root=document.getElementById("root");
 const toastEl=document.getElementById("toast");
 let state={user:null,business:null,products:[],sales:[],customers:[],summary:null,page:"dashboard"};
@@ -229,7 +228,7 @@ let state={user:null,business:null,products:[],sales:[],customers:[],summary:nul
 function esc(v){return String(v??"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]})}
 function money(v){return Number(v||0).toLocaleString("fr-FR")+" FCFA"}
 function toast(m){toastEl.textContent=m;toastEl.classList.remove("hidden");setTimeout(function(){toastEl.classList.add("hidden")},2800)}
-async function session(){return (await supabaseClient.auth.getSession()).data.session}
+async function session(){if(!supabaseClient)return null;return (await supabaseClient.auth.getSession()).data.session}
 async function call(path,opts){
   opts=opts||{};
   const s=await session();
@@ -461,7 +460,32 @@ function openProduct(){const m=modal("Ajouter un produit ou service",'<div class
 function openSale(){const m=modal("Enregistrer une vente",'<div class="field"><label>Montant total (FCFA)</label><input id="sTotal" type="number" placeholder="5000"></div><div class="field"><label>Mode de paiement</label><select id="sPay"><option value="cash">Espèces</option><option value="mobile_money">Mobile Money</option><option value="other">Autre</option></select></div><button class="btn btn-primary full" id="sSave">Enregistrer la vente</button>');m.querySelector("#sSave").onclick=async function(){try{await call("/api/sales",{method:"POST",body:JSON.stringify({total:m.querySelector("#sTotal").value,payment_method:m.querySelector("#sPay").value})});m.remove();await loadData();state.page="dashboard";renderPage();toast("Vente enregistrée.");}catch(e){toast(e.message)}}}
 async function sendAssistant(q){q=String(q||"").trim();if(!q)return;const chat=document.getElementById("chat");if(!chat)return;chat.innerHTML+='<div class="bubble user">'+esc(q)+'</div>';chat.innerHTML+='<div class="bubble ai" id="thinking">Analyse en cours…</div>';chat.scrollTop=chat.scrollHeight;try{const d=await call("/api/assistant",{method:"POST",body:JSON.stringify({message:q})});const t=document.getElementById("thinking");if(t)t.outerHTML='<div class="bubble ai">'+esc(d.answer||"Je n’ai pas pu répondre.")+'</div>'}catch(e){const t=document.getElementById("thinking");if(t)t.outerHTML='<div class="bubble ai">Je rencontre un problème pour répondre. Réessayez dans un instant.</div>'}chat.scrollTop=chat.scrollHeight}
 
+function loadScript(src){
+return new Promise(function(resolve,reject){
+  var s=document.createElement("script");
+  s.src=src;
+  s.async=true;
+  s.onload=function(){resolve()};
+  s.onerror=function(){reject(new Error("Impossible de charger le module de connexion."))};
+  document.head.appendChild(s);
+});
+}
+async function initSupabase(){
+if(!window.supabase || typeof window.supabase.createClient!=="function"){
+  var sources=[
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
+    "https://unpkg.com/@supabase/supabase-js@2"
+  ];
+  var loaded=false;
+  for(var i=0;i<sources.length;i++){
+    try{await loadScript(sources[i]);if(window.supabase && typeof window.supabase.createClient==="function"){loaded=true;break}}catch(e){}
+  }
+  if(!loaded)throw new Error("Le module de connexion est indisponible.");
+}
+supabaseClient=window.supabase.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:"mon-assistant-pro-auth"}});
 supabaseClient.auth.onAuthStateChange(function(event,s){if(event==="SIGNED_OUT")landingView();if(event==="PASSWORD_RECOVERY")recoveryView();});
-(async function(){try{await boot()}catch(e){console.error(e);landingView()}})();
+}
+landingView();
+initSupabase().then(function(){return boot()}).catch(function(e){console.error(e);/* La page d’accueil reste volontairement visible si le module de connexion est indisponible. */});
 </script>
 </body></html>`;
