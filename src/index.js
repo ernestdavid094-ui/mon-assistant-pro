@@ -554,16 +554,15 @@ return supabaseClient;
 try{return await supabaseInitPromise}catch(e){supabaseInitPromise=null;throw e}
 }
 function bindFallbackAuth(){
-  var bindings=[
-    ["fallbackLogin","login"],
-    ["fallbackSignup","signup"],
-    ["fallbackHeroSignup","signup"],
-    ["fallbackFinalSignup","signup"]
-  ];
-  bindings.forEach(function(item){
-    var el=document.getElementById(item[0]);
-    if(el)el.onclick=function(){openAuth(item[1])};
-  });
+  if(window.__authEntryPointsBound)return;
+  window.__authEntryPointsBound=true;
+  document.addEventListener("click",function(e){
+    var el=e.target&&e.target.closest?e.target.closest("#goLogin,#goSignup,#heroSignup,#finalSignup,.plan-btn"):null;
+    if(!el)return;
+    e.preventDefault();
+    e.stopPropagation();
+    openAuth(el.id==="goLogin"?"login":"signup");
+  },true);
 }
 bindFallbackAuth();
 landingView();
