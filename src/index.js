@@ -290,12 +290,11 @@ async function call(path,opts){
   return d;
 }
 
-async function openAuth(mode,screen){
+function openAuth(mode,screen){
   try{
-    await initSupabase();
     authView(mode,screen);
   }catch(e){
-    toast(e.message||"Le module de connexion est indisponible. Réessayez dans un instant.");
+    toast(e.message||"Impossible d’ouvrir la connexion. Réessayez dans un instant.");
   }
 }
 
@@ -370,6 +369,7 @@ form.innerHTML=(isSignup?'<div class="field"><label>Votre nom</label><input id="
 }
 async function submit(){
 const msg=document.getElementById("authMsg");
+try{await initSupabase()}catch(e){msg.textContent=e.message||"Le module de connexion est indisponible.";msg.style.color="#d92d20";return}
 msg.textContent="";
 try{
 if(isPhone){
@@ -553,6 +553,19 @@ return supabaseClient;
 })();
 try{return await supabaseInitPromise}catch(e){supabaseInitPromise=null;throw e}
 }
+function bindFallbackAuth(){
+  var bindings=[
+    ["fallbackLogin","login"],
+    ["fallbackSignup","signup"],
+    ["fallbackHeroSignup","signup"],
+    ["fallbackFinalSignup","signup"]
+  ];
+  bindings.forEach(function(item){
+    var el=document.getElementById(item[0]);
+    if(el)el.onclick=function(){openAuth(item[1])};
+  });
+}
+bindFallbackAuth();
 landingView();
 initSupabase().then(function(){return boot()}).catch(function(e){console.error(e);/* La page d’accueil reste volontairement visible si le module de connexion est indisponible. */});
 </script>
