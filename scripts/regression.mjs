@@ -16,7 +16,7 @@ const checks=[
   ["AI route", /p==="\/api\/assistant"/],
   ["Cloudflare AI model", /@cf\/meta\/llama-3\.2-3b-instruct/],
   ["preview assistant action", /data-go="assistant"/],
-  ["single worker root handler", /(src|)/],
+  ["single worker root handler", /if\(url\.pathname === "\/" \|\| url\.pathname === "\/index\.html"\)/],
   ["no duplicate root handler", !((src.match(/if\(url\.pathname === "\/" \|\| url\.pathname === "\/index\.html"\)/g)||[]).length>1)],
   ["dashboard navigation", /data-page="dashboard"/],
   ["activity navigation", /data-page="activity"/],
