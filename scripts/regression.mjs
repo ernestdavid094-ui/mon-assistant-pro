@@ -37,7 +37,12 @@ const checks=[
   ["logout action", /auth\.signOut\(\)/],
 ];
 
-const browserScript=(src.match(/<script>([\\s\\S]*?)<\\/script>/)||[])[1];
+const scriptStart=src.indexOf("<script>");
+const scriptEnd=scriptStart<0 ? -1 : src.indexOf("</script>",scriptStart);
+const browserScript=scriptStart>=0 && scriptEnd>scriptStart
+  ? src.slice(scriptStart+"<script>".length,scriptEnd)
+  : null;
+
 if(!browserScript){console.error("Regression checks failed: browser script missing");process.exit(1);}
 try{new Function(browserScript);}catch(error){console.error("Browser JavaScript syntax error:",error.message);process.exit(1);}
 
