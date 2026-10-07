@@ -194,7 +194,7 @@ export default {
   }
 };
 
-const HTML = String.raw\`<!doctype html>
+const HTML = String.raw`<!doctype html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
@@ -331,4 +331,4 @@ async function sendAssistant(q){q=String(q||"").trim();if(!q)return;const chat=d
 supabaseClient.auth.onAuthStateChange(function(event,s){if(event==="SIGNED_OUT")loginView()});
 (async function(){try{await boot()}catch(e){console.error(e);loginView()}})();
 </script>
-</body></html>\`;
+</body></html>`;
