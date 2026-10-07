@@ -414,8 +414,18 @@ document.getElementById("createBusiness").onclick=async function(){const name=do
 }
 
 async function loadData(){
-const results=await Promise.all([call("/api/products"),call("/api/sales"),call("/api/customers"),call("/api/summary")]);
-state.products=results[0].products||[];state.sales=results[1].sales||[];state.customers=results[2].customers||[];state.summary=results[3].summary;
+const results=await Promise.allSettled([
+  call("/api/products"),
+  call("/api/sales"),
+  call("/api/customers"),
+  call("/api/summary")
+]);
+state.products=results[0].status==="fulfilled" ? (results[0].value.products||[]) : [];
+state.sales=results[1].status==="fulfilled" ? (results[1].value.sales||[]) : [];
+state.customers=results[2].status==="fulfilled" ? (results[2].value.customers||[]) : [];
+state.summary=results[3].status==="fulfilled" ? results[3].value.summary : null;
+const failed=results.find(function(x){return x.status==="rejected"});
+if(failed) console.warn("Certaines données secondaires n'ont pas pu être chargées.",failed.reason);
 }
 async function boot(){
 const s=await session();if(!s){landingView();return;}
