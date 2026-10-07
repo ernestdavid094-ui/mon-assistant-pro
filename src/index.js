@@ -275,7 +275,7 @@ function benefit(n,title,desc){return '<div class="benefit-item"><span>'+n+'</sp
 function plan(name,price,period,features,cta,featured){return '<div class="plan '+(featured?'featured':'')+'">'+(featured?'<div class="popular">LE PLUS CHOISI</div>':'')+'<h3>'+name+'</h3><div class="plan-price">'+price+'<small>'+(period==='Pour démarrer'?'':' / '+period)+'</small></div><p class="plan-for">'+period+'</p><div class="plan-features">'+features+'</div><button class="btn '+(featured?'btn-primary':'btn-secondary')+' full plan-btn">'+cta+'</button></div>'}
 
 function authView(mode,screen){
-const isSignup=mode==="signup";
+const isSignup=mode==="signup" || (mode==="phone" && screen==="signup");
 const isPhone=mode==="phone";
 const isReset=screen==="reset";
 if(isReset){
@@ -320,9 +320,10 @@ if(raw.length<7)throw Error("Entrez un numéro de téléphone valide.");
 if(password.length<8)throw Error("Le mot de passe doit contenir au moins 8 caractères.");
 if(isSignup){
 const recovery=document.getElementById("phoneRecoveryEmail")?.value.trim()||"";
-const {data,error}=await supabaseClient.auth.signUp({phone,password,options:{data:{recovery_email:recovery}}});
+const {data,error}=await supabaseClient.auth.signUp({phone,password});
 if(error)throw error;
-if(!data.session){msg.style.color="#067647";msg.textContent="Compte créé. Si la confirmation du téléphone est activée dans Supabase, un SMS serait nécessaire. Nous l’avons désactivée pour ce mode.";return}
+if(!data.session){msg.style.color="#067647";msg.textContent="Compte créé. La confirmation du téléphone doit rester désactivée pour utiliser ce mode sans SMS.";return}
+if(recovery){const {error:emailError}=await supabaseClient.auth.updateUser({email:recovery});if(emailError){msg.style.color="#b54708";msg.textContent="Compte créé, mais l’email de récupération n’a pas pu être ajouté. Ajoutez-le ensuite dans Réglages.";return}}
 await boot();
 }else{
 const {error}=await supabaseClient.auth.signInWithPassword({phone,password});
