@@ -197,6 +197,10 @@ export default {
   async fetch(req, env) {
     const url=new URL(req.url);
     if(url.pathname.startsWith("/api/")) return api(req,env);
+    if(env.ASSETS){
+      const asset=await env.ASSETS.fetch(req);
+      if(asset.status!==404) return asset;
+    }
     return new Response(HTML,{headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});
   }
 };
