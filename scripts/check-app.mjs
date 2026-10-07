@@ -4,7 +4,7 @@ const source=fs.readFileSync("src/index.js","utf8");
 const required=[
   'function landingView()',
   'function authView(mode,screen)',
-  'async function openAuth(mode,screen)',
+  'function openAuth(mode,screen)',
   'document.getElementById("goLogin").onclick=()=>openAuth("login")',
   'document.getElementById("goSignup").onclick=()=>openAuth("signup")',
   'document.querySelectorAll(".plan-btn")',
