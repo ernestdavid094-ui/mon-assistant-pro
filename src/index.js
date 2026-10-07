@@ -215,7 +215,58 @@ const HTML = String.raw`<!doctype html>
 </style>
 </head>
 <body>
-<div id="root"><div class="landing-fallback" style="min-height:100vh;background:#fff;color:#101828;font-family:system-ui,-apple-system,Segoe UI,sans-serif"><header style="height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 7vw;border-bottom:1px solid #eaecf0"><div style="display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px"><span style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#635bff,#7c3aed);color:#fff;display:grid;place-items:center">M</span>Mon Assistant Pro</div><div style="display:flex;gap:10px"><button id="fallbackLogin" style="border:1px solid #d0d5dd;background:#fff;border-radius:12px;padding:11px 16px;font-weight:700">Se connecter</button><button id="fallbackSignup" style="border:0;background:#635bff;color:#fff;border-radius:12px;padding:11px 16px;font-weight:700">Créer mon espace</button></div></header><main style="min-height:calc(100vh - 76px);display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;padding:70px 7vw;background:radial-gradient(circle at 85% 15%,#ece9ff 0,transparent 32%),linear-gradient(180deg,#fff,#f8f7ff)"><section><div style="display:inline-block;padding:8px 12px;border-radius:999px;background:#efedff;color:#5146b8;font-size:13px;font-weight:800">✦ L’assistant commercial pensé pour les petites activités</div><h1 style="font-size:clamp(42px,6vw,72px);line-height:.98;letter-spacing:-.06em;margin:20px 0">Votre activité mérite un assistant qui <span style="color:#635bff">travaille avec vous.</span></h1><p style="font-size:19px;line-height:1.6;color:#667085;max-width:650px">Comprenez votre activité, attirez des clients, vendez, organisez vos informations et décidez quoi faire ensuite — même si vous débutez.</p><div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px"><button id="fallbackHeroSignup" style="border:0;background:#635bff;color:#fff;border-radius:13px;padding:15px 20px;font-weight:800">Commencer gratuitement →</button><a href="#fallbackSolution" style="border:1px solid #d0d5dd;background:#fff;color:#101828;border-radius:13px;padding:15px 20px;font-weight:800;text-decoration:none">Découvrir</a></div></section><section style="display:flex;justify-content:center"><div style="width:min(480px,100%);background:#111827;border-radius:28px;padding:20px;box-shadow:0 35px 90px rgba(31,35,80,.22)"><div style="color:#fff;font-weight:800;padding:5px">Mon Assistant Pro <span style="float:right;color:#65d89a;font-size:12px">● En ligne</span></div><div style="background:#1f2937;border-radius:18px;padding:20px;color:#fff;margin-top:15px"><small style="color:#98a2b3">Votre prochaine action</small><h2 style="margin:8px 0">Une activité mieux organisée.</h2><p style="color:#cbd0df;line-height:1.5">Votre assistant vous aide à comprendre, décider et agir.</p></div><div style="padding:10px 2px;color:#dbe2ea;font-size:13px;line-height:1.5"><p style="background:#1f2937;padding:12px;border-radius:13px">Bonjour 👋 Voici ce que je vous conseille aujourd’hui.</p><p style="background:#635bff;padding:12px;border-radius:13px;margin-left:15%">Que dois-je faire maintenant ?</p><p style="background:#1f2937;padding:12px;border-radius:13px">Je vous donne vos priorités à partir de votre activité.</p></div></div></section></main></div></div>
+<div id="root"><div class="landing">
+<header class="landing-nav">
+  <div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div>
+  <div class="landing-links"><a href="#fallback-solution">Ce que je peux faire</a><a href="#fallback-benefits">Avantages</a><a href="#fallback-plans">Formules</a></div>
+  <div class="landing-actions"><button class="btn btn-secondary" id="fallbackLogin">Se connecter</button><button class="btn btn-primary" id="fallbackSignup">Créer mon espace</button></div>
+</header>
+<main>
+<section class="landing-hero">
+  <div class="hero-left">
+    <div class="pill dark-pill">✦ L’assistant commercial pensé pour les petites activités</div>
+    <h1>Votre activité mérite un assistant qui <span>travaille avec vous.</span></h1>
+    <p>Mon Assistant Pro vous aide à comprendre votre activité, attirer des clients, vendre, organiser vos informations et décider quoi faire ensuite — même si vous débutez.</p>
+    <div class="hero-actions"><button class="btn btn-primary btn-lg" id="fallbackHeroSignup">Commencer gratuitement →</button><a class="btn btn-secondary btn-lg" href="#fallback-solution">Découvrir comment ça marche</a></div>
+    <div class="trust-row"><span>✓ Email + mot de passe simple</span><span>✓ Simple à utiliser</span><span>✓ Pensé pour le terrain</span></div>
+  </div>
+  <div class="hero-card"><div class="mini-window">
+    <div class="mini-top"><span>Mon Assistant Pro</span><span class="live-dot">● En ligne</span></div>
+    <div class="mini-kpi"><div><small>Objectif du jour</small><b>23 500 FCFA</b></div><div class="mini-progress"><span></span></div></div>
+    <div class="mini-chat"><div class="mini-msg ai">Bonjour 👋 Voici ce que je vous conseille aujourd’hui.</div><div class="mini-msg ai strong">1. Relancez vos 4 clients inactifs<br>2. Mettez votre meilleure offre en avant<br>3. Ajoutez votre nouveau produit</div><div class="mini-msg user">Prépare-moi le message WhatsApp.</div><div class="mini-msg ai">Bien sûr. Je prépare un message prêt à envoyer.</div></div>
+  </div></div>
+</section>
+<section id="fallback-solution" class="landing-section">
+  <div class="section-intro"><span class="eyebrow">UN SEUL ESPACE</span><h2>Tout ce dont vous avez besoin pour avancer.</h2><p>Vous n’avez pas besoin de maîtriser la technologie. Vous expliquez votre activité, Mon Assistant Pro vous aide à transformer cela en actions.</p></div>
+  <div class="feature-grid">
+    <div class="feature-card"><div class="feature-icon">✦</div><h3>Comprendre</h3><p>Décrivez votre activité, vos produits, vos clients et vos objectifs. Votre assistant garde le contexte.</p><small>→ Votre activité devient claire et exploitable.</small></div>
+    <div class="feature-card"><div class="feature-icon">◎</div><h3>Décider</h3><p>Demandez quoi faire, quoi améliorer, comment vendre davantage ou comment résoudre un problème.</p><small>→ Des priorités plutôt que des conseils dispersés.</small></div>
+    <div class="feature-card"><div class="feature-icon">▣</div><h3>Vendre</h3><p>Présentez vos produits ou services dans une page professionnelle et préparez vos messages commerciaux.</p><small>→ Une présence commerciale simple et crédible.</small></div>
+    <div class="feature-card"><div class="feature-icon">↗</div><h3>Suivre</h3><p>Enregistrez vos ventes, vos clients et vos indicateurs essentiels.</p><small>→ Vous savez ce qui se passe réellement.</small></div>
+  </div>
+</section>
+<section id="fallback-benefits" class="benefits-section">
+  <div class="benefit-copy"><span class="eyebrow">PENSÉ POUR LE TERRAIN</span><h2>Simple pour vous. Puissant quand votre activité grandit.</h2><div class="benefit-list">
+    <div class="benefit-item"><span>01</span><div><h3>Vous partez de zéro</h3><p>Vous avez seulement une idée ? L’assistant peut vous aider à structurer le projet et choisir les premières étapes.</p></div></div>
+    <div class="benefit-item"><span>02</span><div><h3>Vous avez déjà une activité</h3><p>Ajoutez vos informations, produits et ventes. L’assistant s’appuie sur votre réalité, pas sur des suppositions.</p></div></div>
+    <div class="benefit-item"><span>03</span><div><h3>Vous voulez vendre plus</h3><p>Obtenez des idées d’offres, des arguments, des messages et des actions prioritaires.</p></div></div>
+    <div class="benefit-item"><span>04</span><div><h3>Vous voulez garder le contrôle</h3><p>L’assistant prépare et recommande. Vous gardez la décision finale avant toute action sensible.</p></div></div>
+  </div></div>
+  <div class="benefit-panel"><div class="quote-mark">“</div><h3>Une personne + une ambition → un résultat concret.</h3><p>Mon Assistant Pro est conçu pour faire passer votre activité de l’idée à l’action, puis de l’action à l’amélioration.</p><div class="result-line"><span>Idée</span><b>→</b><span>Action</span><b>→</b><span>Résultat</span><b>→</b><span>Amélioration</span></div></div>
+</section>
+<section id="fallback-plans" class="landing-section plans">
+  <div class="section-intro"><span class="eyebrow">FORMULES</span><h2>Commencez petit. Évoluez quand votre activité évolue.</h2><p>Les formules sont conçues pour ne pas vous faire payer des fonctions inutiles au départ.</p></div>
+  <div class="plan-grid">
+    <div class="plan"><h3>Essentiel</h3><div class="plan-price">0 FCFA</div><p class="plan-for">Pour démarrer</p><div class="plan-features">✓ Espace professionnel<br>✓ Produits & services<br>✓ Page commerciale<br>✓ Assistant Pro limité<br>✓ Suivi de base</div><button class="btn btn-secondary full" id="fallbackPlanFree">Créer mon espace</button></div>
+    <div class="plan featured"><div class="popular">LE PLUS CHOISI</div><h3>Pro</h3><div class="plan-price">3 500 FCFA<small> / mois</small></div><p class="plan-for">par mois</p><div class="plan-features">✓ Tout Essentiel<br>✓ Assistant commercial renforcé<br>✓ Conseils & stratégies<br>✓ Contenus et messages commerciaux<br>✓ Suivi des ventes et clients<br>✓ Recommandations d’actions</div><button class="btn btn-primary full" id="fallbackPlanPro">Choisir Pro</button></div>
+    <div class="plan"><h3>Pro+</h3><div class="plan-price">10 000 FCFA<small> / mois</small></div><p class="plan-for">par mois</p><div class="plan-features">✓ Tout Pro<br>✓ Analyses avancées<br>✓ Recommandations proactives<br>✓ Campagnes commerciales<br>✓ Automatisations supplémentaires<br>✓ Priorité sur les nouvelles fonctions</div><button class="btn btn-secondary full" id="fallbackPlanPlus">Choisir Pro+</button></div>
+  </div>
+  <p class="plans-note">Les tarifs pourront évoluer avec le produit. Aucun paiement automatique n’est activé tant que le système de paiement n’est pas connecté.</p>
+</section>
+<section class="final-cta"><div><span class="eyebrow light">PRÊT À COMMENCER ?</span><h2>Votre activité. Votre ambition. Votre assistant.</h2><p>Créez votre espace en quelques secondes avec votre numéro de téléphone.</p></div><button class="btn btn-white btn-lg" id="fallbackFinalSignup">Créer mon espace gratuitement →</button></section>
+</main>
+<footer class="landing-footer"><div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div><span>© 2026 — Votre copilote commercial intelligent.</span></footer>
+</div></div>
 <div id="toast" class="toast hidden"></div>
 <script>
 const SUPA_URL="https://mpskusndhblcxzcikzey.supabase.co";
