@@ -290,6 +290,15 @@ async function call(path,opts){
   return d;
 }
 
+async function openAuth(mode,screen){
+  try{
+    await initSupabase();
+    authView(mode,screen);
+  }catch(e){
+    toast(e.message||"Le module de connexion est indisponible. Réessayez dans un instant.");
+  }
+}
+
 function landingView(){
 root.innerHTML='<div class="landing">'+
 '<header class="landing-nav"><div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div><div class="landing-links"><a href="#solution">Ce que je peux faire</a><a href="#benefits">Avantages</a><a href="#plans">Formules</a></div><div class="landing-actions"><button class="btn btn-secondary" id="goLogin">Se connecter</button><button class="btn btn-primary" id="goSignup">Créer mon espace</button></div></header>'+
@@ -314,10 +323,11 @@ plan("Pro+","10 000 FCFA","par mois","✓ Tout Pro<br>✓ Analyses avancées<br>
 '</div><p class="plans-note">Les tarifs pourront évoluer avec le produit. Aucun paiement automatique n’est activé tant que le système de paiement n’est pas connecté.</p></section>'+
 '<section class="final-cta"><div><span class="eyebrow light">PRÊT À COMMENCER ?</span><h2>Votre activité. Votre ambition. Votre assistant.</h2><p>Créez votre espace en quelques secondes avec votre numéro de téléphone.</p></div><button class="btn btn-white btn-lg" id="finalSignup">Créer mon espace gratuitement →</button></section>'+
 '</main><footer class="landing-footer"><div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div><span>© 2026 — Votre copilote commercial intelligent.</span></footer></div>';
-document.getElementById("goLogin").onclick=()=>authView("login");
-document.getElementById("goSignup").onclick=()=>authView("signup");
-document.getElementById("heroSignup").onclick=()=>authView("signup");
-document.getElementById("finalSignup").onclick=()=>authView("signup");
+document.getElementById("goLogin").onclick=()=>openAuth("login");
+document.getElementById("goSignup").onclick=()=>openAuth("signup");
+document.getElementById("heroSignup").onclick=()=>openAuth("signup");
+document.getElementById("finalSignup").onclick=()=>openAuth("signup");
+document.querySelectorAll(".plan-btn").forEach(function(btn){btn.onclick=()=>openAuth("signup")});
 document.getElementById("heroDiscover").onclick=()=>document.getElementById("solution").scrollIntoView({behavior:"smooth"});
 }
 function feature(icon,title,desc,result,image,alt){return '<div class="feature-card">'+(image?'<img class="feature-image" src="'+image+'" alt="'+esc(alt||title)+'" loading="lazy">':'')+'<div class="feature-icon">'+icon+'</div><h3>'+title+'</h3><p>'+desc+'</p><small>→ '+result+'</small></div>'}
@@ -511,6 +521,7 @@ function openProduct(){const m=modal("Ajouter un produit ou service",'<div class
 function openSale(){const m=modal("Enregistrer une vente",'<div class="field"><label>Montant total (FCFA)</label><input id="sTotal" type="number" placeholder="5000"></div><div class="field"><label>Mode de paiement</label><select id="sPay"><option value="cash">Espèces</option><option value="mobile_money">Mobile Money</option><option value="other">Autre</option></select></div><button class="btn btn-primary full" id="sSave">Enregistrer la vente</button>');m.querySelector("#sSave").onclick=async function(){try{await call("/api/sales",{method:"POST",body:JSON.stringify({total:m.querySelector("#sTotal").value,payment_method:m.querySelector("#sPay").value})});m.remove();await loadData();state.page="dashboard";renderPage();toast("Vente enregistrée.");}catch(e){toast(e.message)}}}
 async function sendAssistant(q){q=String(q||"").trim();if(!q)return;const chat=document.getElementById("chat");if(!chat)return;chat.innerHTML+='<div class="bubble user">'+esc(q)+'</div>';chat.innerHTML+='<div class="bubble ai" id="thinking">Analyse en cours…</div>';chat.scrollTop=chat.scrollHeight;try{const d=await call("/api/assistant",{method:"POST",body:JSON.stringify({message:q})});const t=document.getElementById("thinking");if(t)t.outerHTML='<div class="bubble ai">'+esc(d.answer||"Je n’ai pas pu répondre.")+'</div>'}catch(e){const t=document.getElementById("thinking");if(t)t.outerHTML='<div class="bubble ai">Je rencontre un problème pour répondre. Réessayez dans un instant.</div>'}chat.scrollTop=chat.scrollHeight}
 
+let supabaseInitPromise=null;
 function loadScript(src){
 return new Promise(function(resolve,reject){
   var s=document.createElement("script");
@@ -522,6 +533,9 @@ return new Promise(function(resolve,reject){
 });
 }
 async function initSupabase(){
+if(supabaseClient)return supabaseClient;
+if(supabaseInitPromise)return supabaseInitPromise;
+supabaseInitPromise=(async function(){
 if(!window.supabase || typeof window.supabase.createClient!=="function"){
   var sources=[
     "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
@@ -535,6 +549,9 @@ if(!window.supabase || typeof window.supabase.createClient!=="function"){
 }
 supabaseClient=window.supabase.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:"mon-assistant-pro-auth"}});
 supabaseClient.auth.onAuthStateChange(function(event,s){if(event==="SIGNED_OUT")landingView();if(event==="PASSWORD_RECOVERY")recoveryView();});
+return supabaseClient;
+})();
+try{return await supabaseInitPromise}catch(e){supabaseInitPromise=null;throw e}
 }
 landingView();
 initSupabase().then(function(){return boot()}).catch(function(e){console.error(e);/* La page d’accueil reste volontairement visible si le module de connexion est indisponible. */});
