@@ -263,7 +263,7 @@ const HTML = String.raw`<!doctype html>
   </div>
   <p class="plans-note">Les tarifs pourront évoluer avec le produit. Aucun paiement automatique n’est activé tant que le système de paiement n’est pas connecté.</p>
 </section>
-<section class="final-cta"><div><span class="eyebrow light">PRÊT À COMMENCER ?</span><h2>Votre activité. Votre ambition. Votre assistant.</h2><p>Créez votre espace en quelques secondes avec votre numéro de téléphone.</p></div><button class="btn btn-white btn-lg" id="fallbackFinalSignup">Créer mon espace gratuitement →</button></section>
+<section class="final-cta"><div><span class="eyebrow light">PRÊT À COMMENCER ?</span><h2>Votre activité. Votre ambition. Votre assistant.</h2><p>Créez votre espace en quelques secondes avec votre adresse email.</p></div><button class="btn btn-white btn-lg" id="fallbackFinalSignup">Créer mon espace gratuitement →</button></section>
 </main>
 <footer class="landing-footer"><div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div><span>© 2026 — Votre copilote commercial intelligent.</span></footer>
 </div></div>
@@ -355,7 +355,7 @@ finally{document.getElementById("sendReset").disabled=false}
 };
 return;
 }
-root.innerHTML='<div class="auth-page"><div class="auth-side"><div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div><div class="auth-side-copy"><span class="eyebrow light">VOTRE ESPACE PROFESSIONNEL</span><h1>Un accès simple, sans SMS.</h1><p>Choisissez votre méthode préférée : email + mot de passe, ou numéro de téléphone + mot de passe.</p><div class="auth-benefits"><span>✓ Email + mot de passe</span><span>✓ Téléphone + mot de passe</span><span>✓ Récupération du mot de passe par email</span></div></div></div><div class="auth-main"><div class="auth-card auth-modern"><button class="back-link" id="backHome">← Retour à l’accueil</button><div class="auth-icon">M</div><h2 id="authTitle">'+(isSignup?"Créer mon espace":"Se connecter")+'</h2><p class="muted" id="authSub">'+(isSignup?"Choisissez comment vous souhaitez créer votre compte.":"Choisissez votre méthode de connexion.")+'</p><div class="quick" style="margin:18px 0 4px"><button class="btn '+(!isPhone?'btn-primary':'btn-secondary')+'" id="emailMode">✉ Email</button><button class="btn '+(isPhone?'btn-primary':'btn-secondary')+'" id="phoneMode">☎ Téléphone</button></div><div id="authForm"></div><div class="auth-msg" id="authMsg"></div><p class="auth-switch">'+(isSignup?'Vous avez déjà un compte ? <span class="link" id="switchAuth">Se connecter</span>':'Nouveau ici ? <span class="link" id="switchAuth">Créer mon espace</span>')+'</p><div class="security-note">🔒 Aucun SMS n’est utilisé. La récupération du mot de passe se fait par email.</div></div></div></div>';
+root.innerHTML='<div class="auth-page"><div class="auth-side"><div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div><div class="auth-side-copy"><span class="eyebrow light">VOTRE ESPACE PROFESSIONNEL</span><h1>Un accès simple, sans SMS.</h1><p>Choisissez une connexion simple avec votre adresse email et votre mot de passe.</p><div class="auth-benefits"><span>✓ Email + mot de passe</span><span>✓ Connexion email sécurisée</span><span>✓ Récupération du mot de passe par email</span></div></div></div><div class="auth-main"><div class="auth-card auth-modern"><button class="back-link" id="backHome">← Retour à l’accueil</button><div class="auth-icon">M</div><h2 id="authTitle">'+(isSignup?"Créer mon espace":"Se connecter")+'</h2><p class="muted" id="authSub">'+(isSignup?"Choisissez comment vous souhaitez créer votre compte.":"Choisissez votre méthode de connexion.")+'</p><div class="quick" style="margin:18px 0 4px"><button class="btn '+(!isPhone?'btn-primary':'btn-secondary')+'" id="emailMode">✉ Email</button><button class="btn '+(isPhone?'btn-primary':'btn-secondary')+'" id="phoneMode">☎ Téléphone</button></div><div id="authForm"></div><div class="auth-msg" id="authMsg"></div><p class="auth-switch">'+(isSignup?'Vous avez déjà un compte ? <span class="link" id="switchAuth">Se connecter</span>':'Nouveau ici ? <span class="link" id="switchAuth">Créer mon espace</span>')+'</p><div class="security-note">🔒 Aucun SMS n’est utilisé. La récupération du mot de passe se fait par email.</div></div></div></div>';
 document.getElementById("backHome").onclick=landingView;
 document.getElementById("emailMode").onclick=()=>authView(mode==="login"?"login":"signup");
 document.getElementById("phoneMode").onclick=()=>authView("phone",isSignup?"signup":"login");
@@ -557,7 +557,7 @@ function bindFallbackAuth(){
   if(window.__authEntryPointsBound)return;
   window.__authEntryPointsBound=true;
   document.addEventListener("click",function(e){
-    var el=e.target&&e.target.closest?e.target.closest("#goLogin,#goSignup,#heroSignup,#finalSignup,.plan-btn"):null;
+    var el=e.target&&e.target.closest?e.target.closest("#goLogin,#goSignup,#heroSignup,#finalSignup,#fallbackFinalSignup,#fallbackPlanFree,#fallbackPlanPro,#fallbackPlanPlus,.plan-btn"):null;
     if(!el)return;
     e.preventDefault();
     e.stopPropagation();
