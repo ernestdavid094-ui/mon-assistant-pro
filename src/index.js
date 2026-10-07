@@ -205,9 +205,6 @@ export default {
     if(url.pathname === "/" || url.pathname === "/index.html"){
       return new Response(HTML,{headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});
     }
-    if(url.pathname === "/" || url.pathname === "/index.html"){
-      return new Response(HTML,{headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});
-    }
     if(env.ASSETS){
       const asset=await env.ASSETS.fetch(req);
       if(asset.status!==404) return asset;
@@ -368,7 +365,16 @@ if(!data.session){msg.style.color="#b54708";msg.textContent="Compte créé. Vér
 await boot();
 }else{
 const {error}=await supabaseClient.auth.signInWithPassword({email,password});
-if(error)throw error;
+if(error){
+  const message=String(error.message||"");
+  if(error.code==="email_not_confirmed" || /email.*confirm/i.test(message)){
+    try{await supabaseClient.auth.resend({type:"signup",email});}catch{}
+    msg.style.color="#b54708";
+    msg.textContent="Votre adresse email n’est pas encore confirmée. Vérifiez votre boîte mail. Un nouveau lien de confirmation a été demandé.";
+    return;
+  }
+  throw error;
+}
 await boot();
 }
 }
