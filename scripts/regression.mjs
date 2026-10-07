@@ -35,10 +35,10 @@ const checks=[
   ["confirmation resend", /auth\.resend\(\{type:"signup",email\}\)/],
   ["onboarding action", /id="createBusiness"/],
   ["logout action", /auth\.signOut\(\)/],
-  ["adaptive next action", /Commencez par ajouter votre première offre//],
-  ["adaptive assistant CTA", /Obtenir ma première recommandation//],
-  ["adaptive product completion", /Catalogue contient déjà//],
-  ["adaptive onboarding title", /Votre démarrage est bien lancé//],
+  ["adaptive next action", /Commencez par ajouter votre première offre/],
+  ["adaptive assistant CTA", /Obtenir ma première recommandation/],
+  ["adaptive product completion", /Catalogue contient déjà/],
+  ["adaptive onboarding title", /Votre démarrage est bien lancé/],
 ];
 
 const scriptStart=src.indexOf("<script>");
