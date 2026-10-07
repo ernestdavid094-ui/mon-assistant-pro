@@ -202,6 +202,9 @@ export default {
   async fetch(req, env) {
     const url=new URL(req.url);
     if(url.pathname.startsWith("/api/")) return api(req,env);
+    if(url.pathname === "/" || url.pathname === "/index.html"){
+      return new Response(HTML,{headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});
+    }
     if(env.ASSETS){
       const asset=await env.ASSETS.fetch(req);
       if(asset.status!==404) return asset;
@@ -325,7 +328,7 @@ plan("Essentiel","0 FCFA","Pour démarrer","✓ Espace professionnel<br>✓ Prod
 plan("Pro","3 500 FCFA","par mois","✓ Tout Essentiel<br>✓ Assistant commercial renforcé<br>✓ Conseils & stratégies<br>✓ Contenus et messages commerciaux<br>✓ Suivi des ventes et clients<br>✓ Recommandations d’actions","Choisir Pro",true)+
 plan("Pro+","10 000 FCFA","par mois","✓ Tout Pro<br>✓ Analyses avancées<br>✓ Recommandations proactives<br>✓ Campagnes commerciales<br>✓ Automatisations supplémentaires<br>✓ Priorité sur les nouvelles fonctions","Choisir Pro+",false)+
 '</div><p class="plans-note">Les tarifs pourront évoluer avec le produit. Aucun paiement automatique n’est activé tant que le système de paiement n’est pas connecté.</p></section>'+
-'<section class="final-cta"><div><span class="eyebrow light">PRÊT À COMMENCER ?</span><h2>Votre activité. Votre ambition. Votre assistant.</h2><p>Créez votre espace en quelques secondes avec votre numéro de téléphone.</p></div><button class="btn btn-white btn-lg" id="finalSignup">Créer mon espace gratuitement →</button></section>'+
+'<section class="final-cta"><div><span class="eyebrow light">PRÊT À COMMENCER ?</span><h2>Votre activité. Votre ambition. Votre assistant.</h2><p>Créez votre espace en quelques secondes avec votre adresse email.</p></div><button class="btn btn-white btn-lg" id="finalSignup">Créer mon espace gratuitement →</button></section>'+
 '</main><footer class="landing-footer"><div class="brand"><div class="logo">M</div><span>Mon Assistant Pro</span></div><span>© 2026 — Votre copilote commercial intelligent.</span></footer></div>';
 document.getElementById("goLogin").onclick=()=>openAuth("login");
 document.getElementById("goSignup").onclick=()=>openAuth("signup");
