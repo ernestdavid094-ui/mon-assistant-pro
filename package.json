@@ -1,7 +1,13 @@
 {
-  "name":"mon-assistant-pro",
-  "version":"0.2.0",
-  "private":true,
-  "scripts":{"deploy":"wrangler deploy","dev":"wrangler dev"},
-  "devDependencies":{"wrangler":"^4.40.0"}
+  "name": "mon-assistant-pro",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "test": "node scripts/regression.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.40.0"
+  }
 }
