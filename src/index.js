@@ -215,7 +215,7 @@ const HTML = String.raw`<!doctype html>
 </style>
 </head>
 <body>
-<div id="root"></div>
+<div id="root"><div style="min-height:100vh;display:grid;place-items:center;padding:24px;font-family:system-ui,sans-serif;color:#101828"><div style="text-align:center;max-width:520px"><div style="font-size:28px;font-weight:800">Mon Assistant Pro</div><p style="color:#667085;margin-top:10px">Chargement de votre espace…</p></div></div></div>
 <div id="toast" class="toast hidden"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
