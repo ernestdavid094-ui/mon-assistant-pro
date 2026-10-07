@@ -4,9 +4,10 @@ const src=fs.readFileSync("src/index.js","utf8");
 const checks=[
   ["landing login button", /id="goLogin"/],
   ["landing signup button", /id="goSignup"/],
-  ["fallback login handler", /id="fallbackLogin"[^>]*onclick="openAuth\('login'\)"/],
-  ["fallback signup handler", /id="fallbackSignup"[^>]*onclick="openAuth\('signup'\)"/],
-  ["delegated fallback auth", /#fallbackLogin,#fallbackSignup,#fallbackHeroSignup/],
+  ["single landing root", /function landingView\(\)/],
+  ["no fallback landing markup", !/<div id="root"><div class="landing">/.test(src)],
+  ["landing login handler", /document\.getElementById\("goLogin"\)\.onclick/],
+  ["landing signup handler", /document\.getElementById\("goSignup"\)\.onclick/],
   ["email signup", /auth\.signUp\(\{email,password/],
   ["email login", /auth\.signInWithPassword\(\{email,password\}/],
   ["server user validation", /authenticatedUser\(env,token\)/],
