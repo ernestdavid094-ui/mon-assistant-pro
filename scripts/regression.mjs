@@ -31,6 +31,11 @@ const checks=[
   ["onboarding action", /id="createBusiness"/],
   ["logout action", /auth\.signOut\(\)/],
 ];
+
+const browserScript=(src.match(/<script>([\\s\\S]*?)<\\/script>/)||[])[1];
+if(!browserScript){console.error("Regression checks failed: browser script missing");process.exit(1);}
+try{new Function(browserScript);}catch(error){console.error("Browser JavaScript syntax error:",error.message);process.exit(1);}
+
 const failures=checks.filter(([name,re])=>{
   const ok = re instanceof RegExp ? re.test(src) : re;
   return !ok;
