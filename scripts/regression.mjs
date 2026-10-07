@@ -16,6 +16,21 @@ const checks=[
   ["AI route", /p==="\/api\/assistant"/],
   ["Cloudflare AI model", /@cf\/meta\/llama-3\.2-3b-instruct/],
   ["preview assistant action", /data-go="assistant"/],
+  ["single worker root handler", /(src|)/],
+  ["no duplicate root handler", !((src.match(/if\(url\.pathname === "\/" \|\| url\.pathname === "\/index\.html"\)/g)||[]).length>1)],
+  ["dashboard navigation", /data-page="dashboard"/],
+  ["activity navigation", /data-page="activity"/],
+  ["products navigation", /data-page="products"/],
+  ["sales navigation", /data-page="sales"/],
+  ["customers navigation", /data-page="customers"/],
+  ["assistant navigation", /data-page="assistant"/],
+  ["preview navigation", /data-page="preview"/],
+  ["settings navigation", /data-page="settings"/],
+  ["navigation handler", /state\.page=b\.dataset\.page/],
+  ["email confirmation handling", /email_not_confirmed/],
+  ["confirmation resend", /auth\.resend\(\{type:"signup",email\}\)/],
+  ["onboarding action", /id="createBusiness"/],
+  ["logout action", /auth\.signOut\(\)/],
 ];
 const failures=checks.filter(([name,re])=>!re.test(src));
 if(failures.length){
