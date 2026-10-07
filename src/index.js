@@ -18,7 +18,7 @@ async function sb(env, path, options={}, token) {
   const text = await r.text();
   let data;
   try { data = text ? JSON.parse(text) : null; } catch { data = text; }
-  if (!r.ok) throw new Error(typeof data === "object" ? JSON.stringify(data) : data);
+  if (!r.ok) { const detail = typeof data === "object" ? (data?.message || data?.error_description || data?.hint || JSON.stringify(data)) : String(data || ""); throw new Error("Supabase (" + r.status + "): " + (detail || "requête refusée")); }
   return data;
 }
 
@@ -27,9 +27,17 @@ function tokenFrom(req) {
   return h.startsWith("Bearer ") ? h.slice(7) : null;
 }
 
-async function currentBusiness(env, token) {
-  const rows = await sb(env, "businesses?select=*&order=created_at.asc&limit=1", {method:"GET"}, token);
+async function currentBusiness(env, token, ownerId) {
+  const filter = ownerId ? "&owner_id=eq." + encodeURIComponent(ownerId) : "";
+  const rows = await sb(env, "businesses?select=*&order=created_at.asc&limit=1" + filter, {method:"GET"}, token);
   return rows && rows[0] ? rows[0] : null;
+}
+
+async function authenticatedUser(env, token) {
+  const auth=await fetch(env.SUPABASE_URL+"/auth/v1/user",{headers:{apikey:env.SUPABASE_PUBLISHABLE_KEY,Authorization:"Bearer "+token}});
+  const raw=await auth.text(); let data=null; try{data=raw?JSON.parse(raw):null}catch{}
+  if(!auth.ok || !data?.id) throw new Error("Session Supabase invalide.");
+  return data;
 }
 
 async function api(req, env) {
@@ -40,18 +48,15 @@ async function api(req, env) {
 
   try {
     if (p==="/api/me" && req.method==="GET") {
-      const b=await currentBusiness(env,token);
-      return json({business:b});
+      const u=await authenticatedUser(env,token);
+      const b=await currentBusiness(env,token,u.id);
+      return json({user:{id:u.id,email:u.email||null},business:b});
     }
 
     if (p==="/api/business" && (req.method==="POST" || req.method==="PATCH")) {
       const body=await req.json();
-      const auth=await fetch(env.SUPABASE_URL+"/auth/v1/user",{
-        headers:{apikey:env.SUPABASE_PUBLISHABLE_KEY,Authorization:"Bearer "+token}
-      });
-      if(!auth.ok) return json({error:"Session invalide."},401);
-      const u=await auth.json();
-      const existing=await currentBusiness(env,token);
+      const u=await authenticatedUser(env,token);
+      const existing=await currentBusiness(env,token,u.id);
       const payload={
         name:String(body.name||"").trim(),
         type:body.type||null,
@@ -400,7 +405,7 @@ const fullName=document.getElementById("fullName")?.value.trim()||"";
 if(!fullName)throw Error("Entrez votre nom.");
 const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{full_name:fullName}}});
 if(error)throw error;
-if(!data.session){msg.style.color="#b54708";msg.textContent="Le compte est créé, mais la confirmation email est encore activée dans Supabase. Désactivez « Confirm email » pour l’accès immédiat.";return}
+if(!data.session){msg.style.color="#b54708";msg.textContent="Compte créé. Vérifiez votre email pour confirmer le compte, puis revenez vous connecter.";return}
 await boot();
 }else{
 const {error}=await supabaseClient.auth.signInWithPassword({email,password});
@@ -448,11 +453,14 @@ const results=await Promise.all([call("/api/products"),call("/api/sales"),call("
 state.products=results[0].products||[];state.sales=results[1].sales||[];state.customers=results[2].customers||[];state.summary=results[3].summary;
 }
 async function boot(){
-const s=await session();if(!s)return landingView();
+const s=await session();if(!s){landingView();return;}
 state.user=s.user||null;
-const me=await call("/api/me");state.business=me.business;
-if(!state.business)return onboarding();
-await loadData();shell();renderPage();
+try{
+  const me=await call("/api/me");
+  state.business=me.business||null;
+  if(!state.business){onboarding();return;}
+  await loadData(); shell(); renderPage();
+}catch(e){ console.error("boot",e); toast(e.message||"Impossible de charger votre espace. Réessayez."); }
 }
 
 function setActive(){document.querySelectorAll("#nav button").forEach(function(b){b.classList.toggle("active",b.dataset.page===state.page)})}
