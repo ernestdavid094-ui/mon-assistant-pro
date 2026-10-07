@@ -359,7 +359,7 @@ if(password.length<8)throw Error("Le mot de passe doit contenir au moins 8 carac
 if(isSignup){
 const fullName=document.getElementById("fullName")?.value.trim()||"";
 if(!fullName)throw Error("Entrez votre nom.");
-const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{full_name:fullName}}});
+const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{full_name:fullName},emailRedirectTo:location.origin+"/"}});
 if(error)throw error;
 if(!data.session){msg.style.color="#b54708";msg.textContent="Compte créé. Vérifiez votre email pour confirmer le compte, puis revenez vous connecter.";return}
 await boot();
